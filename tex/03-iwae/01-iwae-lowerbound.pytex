@@ -1,0 +1,14 @@
+\points{3a} Prove that IWAE is a valid lower bound of the log-likelihood, and that the ELBO lower bounds IWAE
+
+\begin{equation}\label{eq:14}
+    \log p_{\theta}(\bx) \ge \calL_m(\bx) \ge \calL_1(\bx)
+\end{equation}
+
+for any $m \ge 1$.
+
+\textbf{Hint}: consider Jensen’s Inequality
+
+🐍
+import re
+with open('submission.tex') as f: print((re.search(r'% <SCPD_SUBMISSION_TAG>_3a(.*?)% <SCPD_SUBMISSION_TAG>_3a', f.read(), re.DOTALL)).group(1))
+🐍

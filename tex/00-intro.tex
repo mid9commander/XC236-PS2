@@ -1,0 +1,40 @@
+\textbf{Instructor's Note}
+
+PS2 requires more coding than PS1 and training multiple models. It is important that you
+start this assignment early! It is also in your best interest to make sure that your code 
+is properly vectorized (at no point in this assignment do you need to implement a for-loop) 
+so that the models run faster. If you plan on training the models on GPU, make sure your 
+code can also run on CPU since this we will be running the autograder on CPU. 
+Also, if your GPU has limited memory ($\le$ 2 GB), you will likely run into Out-of-Memory issues on Problem 3.
+
+Here are the expected train times for each part of the assignment:
+\begin{enumerate}
+    \item ~7 minutes for \texttt{vae.py}
+    \item ~7 minutes for \texttt{gmvae.py}
+    \item ~50 minutes for \texttt{ssvae.py}
+    \item $\ge$ 3 hours for \texttt{fsvae.py}. We recommend stopping training the moment your samples
+    look somewhat decent (maybe around 50000 iterations). Note that we periodically
+    save models for you.
+\end{enumerate}
+
+The following is a checklist of various functions you need to implement in the
+submission, in chronological order:
+
+\begin{enumerate}
+    \item \texttt{sample\_gaussian} in \texttt{src/submission/utils.py}
+    \item \texttt{negative\_elbo\_bound} in \texttt{src/submission/models/vae.py}
+    \item \texttt{log\_normal} in \texttt{src/submission/utils.py}
+    \item \texttt{log\_normal\_mixture} in \texttt{src/submission/utils.py}
+    \item \texttt{negative\_elbo\_bound} in \texttt{src/submission/models/gmvae.py}
+    \item \texttt{negative\_iwae\_bound} in \texttt{src/submission/models/vae.py}
+    \item \texttt{negative\_iwae\_bound} in \texttt{src/submission/models/gmvae.py}
+    \item \texttt{negative\_elbo\_bound} in \texttt{src/submission/models/ssvae.py}
+    \item \bf{Extra Credit}: \texttt{negative\_elbo\_bound} in \texttt{src/submission/models/fsvae.py}
+\end{enumerate}
+
+You will submit the entire \texttt{submission} directory. To do so run the command  below from the \texttt{src} directory
+\begin{verbatim}
+    zip -r submission.zip submission
+\end{verbatim}
+
+or you can choose to zip the folder up manually.

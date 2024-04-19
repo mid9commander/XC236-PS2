@@ -1,0 +1,13 @@
+\points{1d} A popular variation of the normal VAE is called the $\beta$-VAE. The $\beta$-VAE optimizes the following objective:
+
+\begin{equation} \label{eq:6}
+    \E_{q_{\phi}(\bz \mid \bx)} [\log p_{\theta}(\bx \mid \bz)] - \beta \KL\left(q_{\phi}\left(\bz \mid \bx\right) \mid\mid p\left(\bz\right)\right)
+\end{equation}
+
+Here, $\beta$ is a positive real number. Offer an intuitive interpretation of the impact of $\beta$ on the optimization of the VAE; 
+specifically, what happens when $\beta = 1$? How about when $\beta$ is increased above 1? For this question, a qualitative description will suffice.
+
+🐍
+import re
+with open('submission.tex') as f: print((re.search(r'% <SCPD_SUBMISSION_TAG>_1d(.*?)% <SCPD_SUBMISSION_TAG>_1d', f.read(), re.DOTALL)).group(1))
+🐍

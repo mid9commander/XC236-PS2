@@ -1,0 +1,83 @@
+\section{Implementing the Importance Weighted Autoencoder (IWAE)}
+
+While the ELBO serves as a lower bound to the true marginal log-likelihood, it may be loose if the variational 
+posterior $q_{\phi}(\bz \mid \bx)$ is a poor approximation to the true posterior $p_{\theta}(\bz \mid \bx)$. 
+It is worth noting that, for a fixed choice of $\bx$, the ELBO is, in expectation, the log of the unnormalized density ratio:
+
+\begin{equation}\label{eq:12}
+    \frac{p_{\theta}(\bx, \bz)}{q_{\phi}(\bz \mid \bx)} = \frac{p_{\theta}(\bz \mid \bx)}{q_{\phi}(\bz \mid \bx)} \cdot p_{\theta}(\bx)
+\end{equation}
+
+where $\bz \sim q_{\phi}(\bz \mid \bx)$. The term $\frac{p_{\theta}(\bz \mid \bx)}{q_{\phi}(\bz \mid \bx)}$ is normalized such that
+
+\begin{equation}
+    E_{q_{\phi}(\bz \mid \bx)}[\frac{p_{\theta}(\bz \mid \bx)}{q_{\phi}(\bz \mid \bx)}] = \int q_{\phi}(\bz \mid \bx)\frac{p_{\theta}(\bz \mid \bx)}{q_{\phi}(\bz \mid \bx)} d \bz = \int p_{\theta}(\bz \mid \bx) d \bz = 1.
+\end{equation}
+
+meaning that if you add the $p_{\theta}(\bx)$ term, it no longer integrates to 1. 
+
+As can be seen from the RHS, the density ratio is \textit{unnormalized} since the 
+density ratio is multiplied by the constant $p_{\theta}(\bx)$. We can obtain a tighter bound by averaging multiple 
+unnormalized density ratios. This is the key idea behind IWAE, which uses $m > 1$ samples from the approximate posterior 
+$q_{\phi}(\bz \mid \bx)$ to obtain the following IWAE bound:
+
+\begin{equation}\label{eq:13}
+    \calL_{m}(\bx;\theta,\phi) = \E_{\bz^{(1)},...,\bz^{(m)} \overset{\text{i.i.d.}}{\sim} q_{\phi}(\bz \mid \bx)} \left(\log \frac{1}{m} \sum\limits_{i=1}^{m} \frac{p_{\theta}\left(\bx, \bz^{(i)}\right)}{q_{\phi}\left(\bz^{(i)} \mid \bx\right)}\right)
+\end{equation}
+
+Notice that for the special case of $m = 1$, the IWAE objective $\calL_m$  reduces to the standard ELBO $L_1 = \E_{z\sim q_{\phi}(\bz \mid \bx)}\left(\log \frac{p_{\theta}\left(\bx, \bz\right)}{q_{\phi}\left(\bz \mid \bx\right)}\right)$.
+
+\begin{enumerate}[label=(\alph*)]
+    \item \input{03-iwae/01-iwae-lowerbound}
+
+    \item \points{3b} Implement IWAE for VAE in the \texttt{negative\_iwae\_bound} function in \texttt{vae.py}. The functions \texttt{duplicate}
+    and \texttt{log\_mean\_exp} defined in \texttt{utils.py} will be helpful.
+
+    \item \points{3c} Run the command below to evaluate your implementation against the test subset:
+    \begin{verbatim}
+        python main.py --model vae --iwae
+    \end{verbatim}
+
+    This will output IWAE bounds for $m = \{1,10,100,1000\}$. Check that the IWAE-1 result is consistent with 
+    your reported ELBO for the VAE. All four IWAE bounds for VAE will be reported to:
+    \begin{enumerate}
+        \item \texttt{submission/VAE\_iwae\_1.pkl}
+        \item \texttt{submission/VAE\_iwae\_10.pkl}
+        \item \texttt{submission/VAE\_iwae\_100.pkl}
+        \item \texttt{submission/VAE\_iwae\_1000.pkl}
+    \end{enumerate}
+
+    To check the accuracy of your results, run:
+    \begin{verbatim}
+        python grader.py 3c-0-basic
+        python grader.py 3c-1-basic
+        python grader.py 3c-2-basic
+        python grader.py 3c-3-basic
+    \end{verbatim}
+
+    \item \points{3d} As IWAE only requires the averaging of multiple unnormalized density ratios, the IWAE bound is also applicable 
+    to the GMVAE model. Repeat parts 2 and 3 for the GMVAE by implementing the \texttt{negative\_iwae\_bound} function in 
+    \texttt{gmvae.py}. 
+    
+    Run 
+    \begin{verbatim}
+        python main.py --model gmvae --iwae
+    \end{verbatim}
+   to evaluate your implementation against the test subset. All four IWAE bounds for GMVAE will be reported to:
+
+   \begin{enumerate}
+        \item \texttt{submission/GMVAE\_iwae\_1.pkl}
+        \item \texttt{submission/GMVAE\_iwae\_10.pkl}
+        \item \texttt{submission/GMVAE\_iwae\_100.pkl}
+        \item \texttt{submission/GMVAE\_iwae\_1000.pkl}
+    \end{enumerate}
+
+    To check the accuracy of your results, run:
+    \begin{verbatim}
+        python grader.py 3d-0-basic
+        python grader.py 3d-1-basic
+        python grader.py 3d-2-basic
+        python grader.py 3d-3-basic
+    \end{verbatim}
+
+\end{enumerate}

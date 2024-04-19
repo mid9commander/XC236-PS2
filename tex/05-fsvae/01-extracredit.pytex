@@ -1,0 +1,9 @@
+\points{5a} Since fully-supervised VAE (FSVAE) always conditions on an observed $y$ in order to generate the sample $\bx$, 
+it is a conditional variational autoencoder. Derive the Evidence Lower Bound $\text{ELBO}(\bx;\theta,\phi,y)$ 
+of the conditional log probability $\log p_\theta(\bx \mid y)$. You are allowed to introduce the amortized inference 
+model $q_{\phi}(\bz \mid \bx, y)$.
+
+🐍
+import re
+with open('submission.tex') as f: print((re.search(r'% <SCPD_SUBMISSION_TAG>_5a(.*?)% <SCPD_SUBMISSION_TAG>_5a', f.read(), re.DOTALL)).group(1))
+🐍
