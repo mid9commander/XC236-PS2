@@ -109,6 +109,12 @@ is thus a form of amortized inference regularization\footnote{Shu, et al. Amorti
         python main.py --model ssvae --train --gw 0
     \end{verbatim}
 
+    To use GPU acceleration run the command below. 
+
+    \begin{verbatim}
+        python main.py --model ssvae --train --gw 0 --device gpu
+    \end{verbatim}
+
     The \texttt{gw} flag denotes how much weight to put on the ELBO(x) 
     term in the objective function; scaling the term by zero corresponds to a traditional supervised learning setting 
     on the small labeled dataset only, where we ignore the unlabeled data. Your classification accuracy on the 
@@ -143,6 +149,11 @@ is thus a form of amortized inference regularization\footnote{Shu, et al. Amorti
     \item \points{4c} Run 
     \begin{verbatim}
         python main.py --model ssvae --train
+    \end{verbatim}
+
+    To use GPU acceleration run the command below.
+    \begin{verbatim}
+        python main.py --model ssvae --train --device gpu
     \end{verbatim}
 
     This will run the SSVAE with the ELBO(x) term included, and thus perform 

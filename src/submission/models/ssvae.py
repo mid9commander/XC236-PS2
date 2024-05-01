@@ -15,22 +15,21 @@ from torch import nn
 from torch.nn import functional as F
 
 class SSVAE(nn.Module):
-    def __init__(self, nn='v1', name='ssvae', gen_weight=1, class_weight=100, device=torch.device('cpu')):
+    def __init__(self, nn='v1', name='ssvae', gen_weight=1, class_weight=100):
         super().__init__()
         self.name = name
         self.z_dim = 64
         self.y_dim = 10
         self.gen_weight = gen_weight
         self.class_weight = class_weight
-        self.device=device
         nn = getattr(nns, nn)
-        self.enc = nn.Encoder(self.z_dim, self.y_dim).to(self.device) # from ./nns/v1.py
-        self.dec = nn.Decoder(self.z_dim, self.y_dim).to(self.device) # from ./nns/v1.py
-        self.cls = nn.Classifier(self.y_dim).to(self.device)
+        self.enc = nn.Encoder(self.z_dim, self.y_dim) # from ./nns/v1.py
+        self.dec = nn.Decoder(self.z_dim, self.y_dim) # from ./nns/v1.py
+        self.cls = nn.Classifier(self.y_dim)
 
         # Set prior as fixed parameter attached to Module
-        self.z_prior_m = torch.nn.Parameter(torch.zeros(1), requires_grad=False).to(self.device)
-        self.z_prior_v = torch.nn.Parameter(torch.ones(1), requires_grad=False).to(self.device)
+        self.z_prior_m = torch.nn.Parameter(torch.zeros(1), requires_grad=False)
+        self.z_prior_v = torch.nn.Parameter(torch.ones(1), requires_grad=False)
         self.z_prior = (self.z_prior_m, self.z_prior_v)
     
     ### START CODE HERE ###

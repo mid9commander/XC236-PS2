@@ -13,21 +13,20 @@ else:
 from torch import nn
 
 class GMVAE(nn.Module):
-    def __init__(self, nn='v1', z_dim=2, k=500, name='gmvae', device=torch.device('cpu')):
+    def __init__(self, nn='v1', z_dim=2, k=500, name='gmvae'):
         super().__init__()
         self.name = name
         self.k = k
         self.z_dim = z_dim
-        self.device = device
         nn = getattr(nns, nn)
-        self.enc = nn.Encoder(self.z_dim).to(self.device) # from ./nns/v1.py
-        self.dec = nn.Decoder(self.z_dim).to(self.device) # from ./nns/v1.py
+        self.enc = nn.Encoder(self.z_dim) # from ./nns/v1.py
+        self.dec = nn.Decoder(self.z_dim) # from ./nns/v1.py
 
         # Mixture of Gaussians prior
         self.z_pre = torch.nn.Parameter(torch.randn(1, 2 * self.k, self.z_dim)
-                                        / np.sqrt(self.k * self.z_dim)).to(self.device)
+                                        / np.sqrt(self.k * self.z_dim))
         # Uniform weighting
-        self.pi = torch.nn.Parameter(torch.ones(k) / k, requires_grad=False).to(self.device)
+        self.pi = torch.nn.Parameter(torch.ones(k) / k, requires_grad=False)
 
     def negative_elbo_bound(self, x):
         """

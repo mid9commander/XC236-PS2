@@ -246,8 +246,11 @@ def load_model_by_name(model, global_step, device=None):
                              model.name,
                              'model-{:05d}.pt'.format(global_step))
     state = torch.load(file_path, map_location=device)
-    model.load_state_dict(state)
-    print("Loaded from {}".format(file_path))
+    try:
+        model.load_state_dict(state)
+        print("Loaded from {}".format(file_path))
+    except:
+        pass
 
 
 ################################################################################
@@ -256,11 +259,11 @@ def load_model_by_name(model, global_step, device=None):
 ################################################################################
 
 def write_to_file(metric, kl, rec, run_iwae, iw, gw, model_type):
-        if run_iwae and not iw:
+        if run_iwae == True:
             file_path = os.path.join(os.path.dirname(__file__), f'{model_type}_iwae_{iw}.pkl')
             with open(file_path, 'wb') as file:
                 pickle.dump({'NIWAE': metric}, file)
-        elif not run_iwae and not kl: 
+        elif run_iwae == False: 
             file_path = os.path.join(os.path.dirname(__file__), f'{model_type}.pkl')
             with open(file_path, 'wb') as file:
                 pickle.dump({'NELBO': metric, 'KL': kl, 'Rec': rec}, file)
@@ -295,7 +298,7 @@ def evaluate_lower_bound(model, labeled_test_subset, run_iwae=True):
 
     # Run multiple times to get low-var estimate
     nelbo, kl, rec = compute_metrics(model.negative_elbo_bound, 100)
-    write_to_file(nelbo, kl, rec, run_iwae, None, None, model.__class__.__name__)
+    write_to_file(nelbo, kl, rec, False, None, None, model.__class__.__name__)
     print("NELBO: {}. KL: {}. Rec: {}".format(nelbo, kl, rec))
 
     if run_iwae:
@@ -303,7 +306,7 @@ def evaluate_lower_bound(model, labeled_test_subset, run_iwae=True):
             repeat = max(100 // iw, 1) # Do at least 100 iterations
             fn = lambda x: model.negative_iwae_bound(x, iw)
             niwae, kl, rec = compute_metrics(fn, repeat)
-            write_to_file(niwae, kl, rec, run_iwae, str(iw), None, model.__class__.__name__)
+            write_to_file(niwae, kl, rec, True, str(iw), None, model.__class__.__name__)
             print("Negative IWAE-{}: {}".format(iw, niwae))
 
 
@@ -332,7 +335,7 @@ def save_model_by_name(model, global_step):
     print('Saved to {}'.format(file_path))
 
 
-def prepare_writer(model_name, overwrite_existing=False):
+def prepare_writer(model_name, overwrite_existing=True):
     log_dir = os.path.join('logs', model_name)
     save_dir = os.path.join('checkpoints', model_name)
     maybe_delete_existing(log_dir, overwrite_existing)
@@ -374,15 +377,15 @@ def reset_weights(m):
         pass
 
 
-def get_mnist_data(device, use_test_subset=True):
+def get_mnist_data(device, batch_size, use_test_subset=True):
     preprocess = transforms.ToTensor()
     train_loader = torch.utils.data.DataLoader(
         datasets.MNIST('data', train=True, download=True, transform=preprocess),
-        batch_size=97,  # Using a weird batch size to prevent students from hard-coding
+        batch_size=batch_size,  # Using a weird batch size to prevent students from hard-coding
         shuffle=True)
     test_loader = torch.utils.data.DataLoader(
         datasets.MNIST('data', train=False, download=True, transform=preprocess),
-        batch_size=97,
+        batch_size=batch_size,
         shuffle=True)
 
     # Create pre-processed training and test sets
@@ -455,11 +458,11 @@ def get_mnist_index(i, test=True):
         return train_idx[i]
 
 
-def get_svhn_data(device):
+def get_svhn_data(batch_size):
     preprocess = transforms.ToTensor()
     train_loader = torch.utils.data.DataLoader(
         datasets.SVHN('data', split='extra', download=True, transform=preprocess),
-        batch_size=100,
+        batch_size=batch_size,
         shuffle=True)
 
     return train_loader, (None, None), (None, None)

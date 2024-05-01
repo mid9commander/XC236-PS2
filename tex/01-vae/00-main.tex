@@ -83,7 +83,7 @@ Your objective is to implement the variational autoencoder by modifying \texttt{
         python main.py --model vae --train
     \end{verbatim}
 
-    To use GPU acceleration run the command below. \textbf{Note:} we are not supporting MPS GPUs as it trains slower than CPU-enabled training on Apple Silicon devices.
+    To use GPU acceleration run the command below.
     \begin{verbatim}
         python main.py --model vae --train --device gpu
     \end{verbatim}
@@ -103,9 +103,9 @@ Your objective is to implement the variational autoencoder by modifying \texttt{
     Also, to visualize 200 digits sampled from $p_{\theta}(\bx)$, you can run after training:
     \begin{verbatim}
         python main.py --model vae
-    \end{verbatim}    
+    \end{verbatim}  
 
-    and your samples will be saved to: \texttt{model=vae\_z=10\_run=0000.png}. The generated samples should look like the image below:
+    Your samples will be saved to: \texttt{model=vae\_z=10\_run=0000.png}. The generated samples should look like the image below:
 
     \begin{figure}[h]
         \centering

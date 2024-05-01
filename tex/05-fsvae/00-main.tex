@@ -36,6 +36,12 @@ demonstrate this phenomenon on the SVHN dataset. To make the problem simpler, we
     \begin{verbatim}
         python main.py --model fsvae --train 
     \end{verbatim}
+
+    To use GPU acceleration run the command below. 
+    \begin{verbatim}
+        python main.py --model fsvae --train --device gpu
+    \end{verbatim}
+
     The default settings will use a max iteration of 1 million. We suggest checking the image quality of 
     $\text{clip}\left(\mu_{\theta}\left(\text{y,z}\right)\right)$—where $\text{clip}(\cdot)$ performs element-wise clipping of 
     outputs outside the range [0, 1]—every 10k iterations and stopping the training whenever the digit classes are recognizable\footnote{An important note about sample quality inspection when modeling continuous images using VAEs with Gaussian observation decoders: modeling continuous image data distributions is quite challenging. Rather than truly sampling $x \sim p_{\theta}(\bx \mid y)$, a common heuristic is to simply sample clip$(\mu_{\theta}(y,z))$ instead}.

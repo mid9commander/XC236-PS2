@@ -58,8 +58,9 @@ def generate_svhn_samples(model, model_name, num_samples=SAMPLES):
     plt.show()
 
 def main(args):
-    # NOTE: we are not supporting `torch.device("mps")` as it trains slower than cpu on Apple Silicon devices
-    if args.device == "gpu" and torch.cuda.is_available():
+    if args.device == "gpu" and torch.backends.mps.is_available() and torch.backends.mps.is_built():
+        device = torch.device("mps")
+    elif args.device == "gpu" and torch.cuda.is_available():
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
@@ -75,8 +76,12 @@ def main(args):
         model_name = '_'.join([t.format(v) for (t, v) in layout])
         print('Model name:', model_name)
 
-        train_loader, labeled_subset, _ = ut.get_mnist_data(device, use_test_subset=True)
-        vae = VAE(z_dim=args.z, name=model_name, device=device)
+        # Scale the #iterations proportional to the batch size
+        iter_max = args.iter_max if args.batch_size == 100 else args.iter_max // (args.batch_size // 100)
+        iter_save = args.iter_save if args.batch_size == 100 else args.iter_save // (args.batch_size // 100)
+
+        train_loader, labeled_subset, _ = ut.get_mnist_data(device, args.batch_size, use_test_subset=True)
+        vae = VAE(z_dim=args.z, name=model_name).to(device)
         if args.train:
             writer = ut.prepare_writer(model_name, overwrite_existing=args.overwrite)
             train(model=vae,
@@ -85,10 +90,10 @@ def main(args):
                 device=device,
                 tqdm=tqdm.tqdm,
                 writer=writer,
-                iter_max=args.iter_max,
-                iter_save=args.iter_save)
+                iter_max=iter_max,
+                iter_save=iter_save)
         else:
-            ut.load_model_by_name(vae, global_step=args.iter_max, device=device)
+            ut.load_model_by_name(vae, global_step=iter_max, device=device)
             generate_mnist_samples(vae, model_name, SAMPLES)
         ut.evaluate_lower_bound(vae, labeled_subset, run_iwae=args.iwae)
     # GMVAE
@@ -101,9 +106,13 @@ def main(args):
         ]
         model_name = '_'.join([t.format(v) for (t, v) in layout])
         print('Model name:', model_name)
+
+        # Scale the #iterations proportional to the batch size
+        iter_max = args.iter_max if args.batch_size == 100 else args.iter_max // (args.batch_size // 100)
+        iter_save = args.iter_save if args.batch_size == 100 else args.iter_save // (args.batch_size // 100)
         
-        train_loader, labeled_subset, _ = ut.get_mnist_data(device, use_test_subset=True)
-        gmvae = GMVAE(z_dim=args.z, k=args.k, name=model_name, device=device)
+        train_loader, labeled_subset, _ = ut.get_mnist_data(device, args.batch_size, use_test_subset=True)
+        gmvae = GMVAE(z_dim=args.z, k=args.k, name=model_name).to(device)
 
         if args.train:
             writer = ut.prepare_writer(model_name, overwrite_existing=args.overwrite)
@@ -113,10 +122,10 @@ def main(args):
                 device=device,
                 tqdm=tqdm.tqdm,
                 writer=writer,
-                iter_max=args.iter_max,
-                iter_save=args.iter_save)
+                iter_max=iter_max,
+                iter_save=iter_save)
         else:
-            ut.load_model_by_name(gmvae, global_step=args.iter_max, device=device)
+            ut.load_model_by_name(gmvae, global_step=iter_max, device=device)
             generate_mnist_samples(gmvae, model_name, SAMPLES)
         ut.evaluate_lower_bound(gmvae, labeled_subset, run_iwae=args.iwae)
     # SSVAE
@@ -133,11 +142,15 @@ def main(args):
         # Logic to change max_iter
         iter_max = 30000 if args.iter_max == 20000 else args.iter_max
 
-        train_loader, labeled_subset, test_set = ut.get_mnist_data(device, use_test_subset=False)
+        # Scale the #iterations proportional to the batch size
+        iter_max = iter_max if args.batch_size == 100 else iter_max // (args.batch_size // 100)
+        iter_save = args.iter_save if args.batch_size == 100 else args.iter_save // (args.batch_size // 100)
+        
+
+        train_loader, labeled_subset, test_set = ut.get_mnist_data(device, args.batch_size, use_test_subset=False)
         ssvae = SSVAE(gen_weight=args.gw,
                     class_weight=args.cw,
-                    name=model_name,
-                    device=device)
+                    name=model_name).to(device)
         
         if args.train:
             writer = ut.prepare_writer(model_name, overwrite_existing=args.overwrite)
@@ -149,9 +162,9 @@ def main(args):
                 tqdm=tqdm.tqdm,
                 writer=writer,
                 iter_max=iter_max,
-                iter_save=args.iter_save)
+                iter_save=iter_save)
         else:
-            ut.load_model_by_name(ssvae, args.iter_max, device=device)
+            ut.load_model_by_name(ssvae, iter_max, device=device)
         ut.evaluate_classifier(ssvae, args.gw, test_set)
     # FSVAE
     elif args.model == "fsvae":
@@ -165,8 +178,12 @@ def main(args):
         # Logic to change max_iter
         iter_max = 1000000 if args.iter_max == 20000 else args.iter_max
 
-        train_loader, labeled_subset, test_set = ut.get_svhn_data(device)
-        fsvae = FSVAE(name=model_name, device=device)
+        # Scale the #iterations proportional to the batch size
+        iter_max = iter_max if args.batch_size == 100 else iter_max // (args.batch_size // 100)
+        iter_save = args.iter_save if args.batch_size == 100 else args.iter_save // (args.batch_size // 100)
+
+        train_loader, labeled_subset, test_set = ut.get_svhn_data(args.batch_size)
+        fsvae = FSVAE(name=model_name).to(device)
 
         if args.train:
             writer = ut.prepare_writer(model_name, overwrite_existing=args.overwrite)
@@ -178,11 +195,11 @@ def main(args):
                 tqdm=tqdm.tqdm,
                 writer=writer,
                 iter_max=iter_max,
-                iter_save=args.iter_save)
+                iter_save=iter_save)
         else:
             # NOTE: using midway point of training to generate samples
             # feel free to use another savepoint to generate samples
-            global_step = 500000
+            global_step = iter_save
             ut.load_model_by_name(fsvae, global_step, device=device)
             generate_svhn_samples(fsvae, model_name, SAMPLES)
 
@@ -190,12 +207,13 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--model", type=str, default="vae", choices=['vae', 'ssvae', 'gmvae', 'fsvae'], help="Model to run")   
-    parser.add_argument('--overwrite', type=int, default=0, help="Flag for overwriting")
+    parser.add_argument('--overwrite', type=int, default=1, help="Flag for overwriting")
     parser.add_argument('--run', type=int, default=0, help="Run ID. In case you want to run replicates")
     parser.add_argument('--train', action='store_true', help="Flag needed to start training")
     parser.add_argument('--cache', action='store_true', help="Cache MNIST and SVHN data to avoid redownloading")
     parser.add_argument('--iwae', action='store_true', help="Adds IWAE")
     parser.add_argument("--device", type=str, default="cpu", choices=['cpu', 'gpu'], help="GPU or CPU acceleration")
+    parser.add_argument('--batch_size', type=int, default=100, help='number of data points to be processed per batch')
 
     # NOTE: iter_max for SSVAE will have a default of 30000
     # NOTE: iter_max for FSVAE will have a default of 1000000
@@ -213,8 +231,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.cache == True:
-        _, _, _ = ut.get_mnist_data(torch.device("cpu"), use_test_subset=True)
-        _, _, _ = ut.get_svhn_data(torch.device("cpu"))
+        _, _, _ = ut.get_mnist_data(torch.device("cpu"), args.batch_size, use_test_subset=True)
+        _, _, _ = ut.get_svhn_data(args.batch_size)
     else:
         main(args)
 

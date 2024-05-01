@@ -29,11 +29,15 @@ ref_log_normal_mixture = torch.Tensor([-4.8879451752, -7.7989110947, -8.33321380
 
 ref_vae_niwae = torch.Tensor([544.3607177734])
 
+device = "cpu"
+
 def max_error(a, b):
+    a = a.to(device)
     error = np.max(np.abs(np.array(a - b)))
     return error
 
 def is_different(a, b, tol):
+    a = a.to(device)
     error = np.max(np.abs(np.array(a - b)))
     return error > tol
 
@@ -89,9 +93,9 @@ class Test_1c(GradedTestCase):
         with open('./submission/VAE.pkl', 'rb') as f:
             metrics = pickle.load(f)
         nelbo, kl, rec = metrics.values()
-        self.assertTrue(not is_different(nelbo, self.nelbo, self.nelbo_tol), f"Max absolute error {max_error(self.nelbo, nelbo)} > {self.nelbo_tol} for NELBO")
-        self.assertTrue(not is_different(kl, self.kl, self.kl_tol), f"Max absolute error {max_error(self.kl, kl)} > {self.kl_tol} for KL")
-        self.assertTrue(not is_different(rec, self.rec, self.rec), f"Max absolute error {max_error(self.rec, rec)} > {self.rec_tol} for Rec")
+        self.assertTrue(not is_different(nelbo, self.nelbo, self.nelbo_tol), f"Max absolute error {max_error(nelbo, self.nelbo)} > {self.nelbo_tol} for NELBO")
+        self.assertTrue(not is_different(kl, self.kl, self.kl_tol), f"Max absolute error {max_error(kl, self.kl)} > {self.kl_tol} for KL")
+        self.assertTrue(not is_different(rec, self.rec, self.rec), f"Max absolute error {max_error(rec, self.rec)} > {self.rec_tol} for Rec")
 
 class Test_2a(GradedTestCase):
     def setUp(self):
@@ -141,9 +145,9 @@ class Test_2b(GradedTestCase):
         with open('./submission/GMVAE.pkl', 'rb') as f:
             metrics = pickle.load(f)
         nelbo, kl, rec = metrics.values()
-        self.assertTrue(not is_different(nelbo, self.nelbo, self.nelbo_tol), f"Max absolute error {max_error(self.nelbo, nelbo)} > {self.nelbo_tol} for NELBO")
-        self.assertTrue(not is_different(kl, self.kl, self.kl_tol), f"Max absolute error {max_error(self.kl, kl)} > {self.kl_tol} for KL")
-        self.assertTrue(not is_different(rec, self.rec, self.rec), f"Max absolute error {max_error(self.rec, rec)} > {self.rec_tol} for Rec")
+        self.assertTrue(not is_different(nelbo, self.nelbo, self.nelbo_tol), f"Max absolute error {max_error(nelbo, self.nelbo)} > {self.nelbo_tol} for NELBO")
+        self.assertTrue(not is_different(kl, self.kl, self.kl_tol), f"Max absolute error {max_error(kl, self.kl)} > {self.kl_tol} for KL")
+        self.assertTrue(not is_different(rec, self.rec, self.rec), f"Max absolute error {max_error(rec, self.rec)} > {self.rec_tol} for Rec")
 
 
 class Test_3b(GradedTestCase):
@@ -185,7 +189,7 @@ class Test_3c(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_1.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_1, self.niwae_1_tol), f"Max absolute error {max_error(self.niwae_1, niwae)} > {self.niwae_1_tol} for NIWAE-1")
+        self.assertTrue(not is_different(niwae, self.niwae_1, self.niwae_1_tol), f"Max absolute error {max_error(niwae, self.niwae_1)} > {self.niwae_1_tol} for NIWAE-1")
     
     @graded()
     def test_1(self):
@@ -193,7 +197,7 @@ class Test_3c(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_10.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_10, self.niwae_10_tol), f"Max absolute error {max_error(self.niwae_10, niwae)} > {self.niwae_10_tol} for NIWAE-10")
+        self.assertTrue(not is_different(niwae, self.niwae_10, self.niwae_10_tol), f"Max absolute error {max_error(niwae, self.niwae_10)} > {self.niwae_10_tol} for NIWAE-10")
     
     @graded()
     def test_2(self):
@@ -201,7 +205,7 @@ class Test_3c(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_100.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_100, self.niwae_100_tol), f"Max absolute error {max_error(self.niwae_100, niwae)} > {self.niwae_100_tol} for NIWAE-100")
+        self.assertTrue(not is_different(niwae, self.niwae_100, self.niwae_100_tol), f"Max absolute error {max_error(niwae, self.niwae_100)} > {self.niwae_100_tol} for NIWAE-100")
     
     @graded()
     def test_3(self):
@@ -209,7 +213,7 @@ class Test_3c(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_1000.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_1000, self.niwae_1000_tol), f"Max absolute error {max_error(self.niwae_1000, niwae)} > {self.niwae_1000_tol} for NIWAE-1000")
+        self.assertTrue(not is_different(niwae, self.niwae_1000, self.niwae_1000_tol), f"Max absolute error {max_error(niwae, self.niwae_1000)} > {self.niwae_1000_tol} for NIWAE-1000")
 
 class Test_3d(GradedTestCase):
     def setUp(self):
@@ -232,7 +236,7 @@ class Test_3d(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_1.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_1, self.niwae_1_tol), f"Max absolute error {max_error(self.niwae_1, niwae)} > {self.niwae_1_tol} for NIWAE-1")
+        self.assertTrue(not is_different(niwae, self.niwae_1, self.niwae_1_tol), f"Max absolute error {max_error(niwae, self.niwae_1)} > {self.niwae_1_tol} for NIWAE-1")
     
     @graded()
     def test_1(self):
@@ -240,7 +244,7 @@ class Test_3d(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_10.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_10, self.niwae_10_tol), f"Max absolute error {max_error(self.niwae_10, niwae)} > {self.niwae_10_tol} for NIWAE-10")
+        self.assertTrue(not is_different(niwae, self.niwae_10, self.niwae_10_tol), f"Max absolute error {max_error(niwae, self.niwae_10)} > {self.niwae_10_tol} for NIWAE-10")
     
     @graded()
     def test_2(self):
@@ -248,7 +252,7 @@ class Test_3d(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_100.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_100, self.niwae_100_tol), f"Max absolute error {max_error(self.niwae_100, niwae)} > {self.niwae_100_tol} for NIWAE-100")
+        self.assertTrue(not is_different(niwae, self.niwae_100, self.niwae_100_tol), f"Max absolute error {max_error(niwae, self.niwae_100)} > {self.niwae_100_tol} for NIWAE-100")
     
     @graded()
     def test_3(self):
@@ -256,7 +260,7 @@ class Test_3d(GradedTestCase):
         with open(f'./submission/{self.model}_iwae_1000.pkl', 'rb') as f:
             metrics = pickle.load(f)
         niwae = metrics['NIWAE']
-        self.assertTrue(not is_different(niwae, self.niwae_1000, self.niwae_1000_tol), f"Max absolute error {max_error(self.niwae_1000, niwae)} > {self.niwae_1000_tol} for NIWAE-1000")
+        self.assertTrue(not is_different(niwae, self.niwae_1000, self.niwae_1000_tol), f"Max absolute error {max_error(niwae, self.niwae_1000)} > {self.niwae_1000_tol} for NIWAE-1000")
 
     ### BEGIN_HIDE ###
     ### END_HIDE ###
@@ -272,7 +276,7 @@ class Test_4a(GradedTestCase):
         with open('./submission/SSVAE_0.pkl', 'rb') as f:
             metrics = pickle.load(f)
         accuracy =metrics['accuracy']
-        self.assertTrue(not is_different(accuracy, self.accuracy, self.accuracy_tol), f"Max absolute error {max_error(self.accuracy, accuracy)} > {self.accuracy_tol} for accuracy with gw=0")
+        self.assertTrue(not is_different(accuracy, self.accuracy, self.accuracy_tol), f"Max absolute error {max_error(accuracy, self.accuracy)} > {self.accuracy_tol} for accuracy with gw=0")
 
 class Test_4b(GradedTestCase):
     def setUp(self):
@@ -308,7 +312,7 @@ class Test_4c(GradedTestCase):
         with open('./submission/SSVAE_1.pkl', 'rb') as f:
             metrics = pickle.load(f)
         accuracy = metrics['accuracy']
-        self.assertTrue(not is_different(accuracy, self.accuracy, self.accuracy_tol), f"Max absolute error {max_error(self.accuracy, accuracy)} > {self.accuracy_tol} for accuracy with gw=1")
+        self.assertTrue(not is_different(accuracy, self.accuracy, self.accuracy_tol), f"Max absolute error {max_error(accuracy, self.accuracy)} > {self.accuracy_tol} for accuracy with gw=1")
 
 class Test_5b(GradedTestCase):
     def setUp(self):

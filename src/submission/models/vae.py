@@ -11,18 +11,17 @@ else:
     from submission.models import nns
 
 class VAE(nn.Module):
-    def __init__(self, nn='v1', name='vae', z_dim=2, device=torch.device('cpu')):
+    def __init__(self, nn='v1', name='vae', z_dim=2):
         super().__init__()
         self.name = name
         self.z_dim = z_dim
-        self.device = device
         nn = getattr(nns, nn)
-        self.enc = nn.Encoder(self.z_dim).to(self.device) # from ./nns/v1.py
-        self.dec = nn.Decoder(self.z_dim).to(self.device) # from ./nns/v1.py
+        self.enc = nn.Encoder(self.z_dim) # from ./nns/v1.py
+        self.dec = nn.Decoder(self.z_dim) # from ./nns/v1.py
 
         # Set prior as fixed parameter attached to Module
-        self.z_prior_m = torch.nn.Parameter(torch.zeros(1).to(self.device), requires_grad=False)
-        self.z_prior_v = torch.nn.Parameter(torch.ones(1).to(self.device), requires_grad=False)
+        self.z_prior_m = torch.nn.Parameter(torch.zeros(1), requires_grad=False)
+        self.z_prior_v = torch.nn.Parameter(torch.ones(1), requires_grad=False)
         self.z_prior = (self.z_prior_m, self.z_prior_v)
 
     def negative_elbo_bound(self, x):
@@ -91,7 +90,7 @@ class VAE(nn.Module):
         raise NotImplementedError
 
     def loss(self, x):
-        nelbo, kl, rec = self.negative_elbo_bound(x.to(self.device))
+        nelbo, kl, rec = self.negative_elbo_bound(x)
         loss = nelbo
 
         summaries = dict((

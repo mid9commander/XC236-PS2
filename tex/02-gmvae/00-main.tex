@@ -48,7 +48,7 @@ where $\bz^{(1)} \sim q_{\phi}(\bz \mid \bx)$ denotes a single sample.
         python main.py --model gmvae --train
     \end{verbatim}
     
-    To use GPU acceleration run the command below. \textbf{Note:} we are not supporting MPS GPUs as it trains slower than CPU-enabled training on Apple Silicon devices.
+    To use GPU acceleration run the command below.
     \begin{verbatim}
         python main.py --model gmvae --train --device gpu
     \end{verbatim}
@@ -72,7 +72,7 @@ where $\bz^{(1)} \sim q_{\phi}(\bz \mid \bx)$ denotes a single sample.
         python main.py --model gmvae
     \end{verbatim}
     
-    and your samples will be saved to: \texttt{model=gmvae\_z=10\_run=0000.png}. The generated samples should look like the image below:
+    Your samples will be saved to: \texttt{model=gmvae\_z=10\_run=0000.png}. The generated samples should look like the image below:
 
     \begin{figure}[h]
         \centering
