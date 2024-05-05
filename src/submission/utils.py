@@ -47,7 +47,7 @@ def sample_gaussian(m, v):
     # 
     # HINT 1: For the reparamterization trick, sample epsilon from a standard Gaussian
     # distribution (mean=0, variance=1), then transform the sample from the target
-    # distribution with mean, μ,  and variance, σ: z = μ + σ * ε
+    # distribution with mean, μ, and stddev, σ: z = μ + σ * ε
     # 
     # HINT 2: torch.normal does sample from a standard Gaussian distribution but does not
     # create a differentiable path through which gradients can flow during backpropagation;

@@ -95,7 +95,7 @@ class Test_1c(GradedTestCase):
         nelbo, kl, rec = metrics.values()
         self.assertTrue(not is_different(nelbo, self.nelbo, self.nelbo_tol), f"Max absolute error {max_error(nelbo, self.nelbo)} > {self.nelbo_tol} for NELBO")
         self.assertTrue(not is_different(kl, self.kl, self.kl_tol), f"Max absolute error {max_error(kl, self.kl)} > {self.kl_tol} for KL")
-        self.assertTrue(not is_different(rec, self.rec, self.rec), f"Max absolute error {max_error(rec, self.rec)} > {self.rec_tol} for Rec")
+        self.assertTrue(not is_different(rec, self.rec, self.rec_tol), f"Max absolute error {max_error(rec, self.rec)} > {self.rec_tol} for Rec")
 
 class Test_2a(GradedTestCase):
     def setUp(self):
@@ -147,7 +147,7 @@ class Test_2b(GradedTestCase):
         nelbo, kl, rec = metrics.values()
         self.assertTrue(not is_different(nelbo, self.nelbo, self.nelbo_tol), f"Max absolute error {max_error(nelbo, self.nelbo)} > {self.nelbo_tol} for NELBO")
         self.assertTrue(not is_different(kl, self.kl, self.kl_tol), f"Max absolute error {max_error(kl, self.kl)} > {self.kl_tol} for KL")
-        self.assertTrue(not is_different(rec, self.rec, self.rec), f"Max absolute error {max_error(rec, self.rec)} > {self.rec_tol} for Rec")
+        self.assertTrue(not is_different(rec, self.rec, self.rec_tol), f"Max absolute error {max_error(rec, self.rec)} > {self.rec_tol} for Rec")
 
 
 class Test_3b(GradedTestCase):
