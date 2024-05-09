@@ -320,7 +320,7 @@ def evaluate_classifier(model, gw, test_set):
 
     X, y = test_set
     pred = model.cls(X)
-    accuracy = (pred.argmax(1) == y).float().mean()
+    accuracy = (pred.argmax(1) == y).float().mean().to("cpu")
     write_to_file(accuracy, None, None, None, None, str(gw), model.__class__.__name__)
     print("Test set classification accuracy: {}".format(accuracy))
 

@@ -32,8 +32,8 @@ class SSVAE(nn.Module):
         self.z_prior_v = torch.nn.Parameter(torch.ones(1), requires_grad=False)
         self.z_prior = (self.z_prior_m, self.z_prior_v)
     
-    ### START CODE HERE ###
-    ### END CODE HERE ###
+    ### BEGIN_HIDE ###
+    ### END_HIDE ###
 
     def negative_elbo_bound(self, x):
         """
