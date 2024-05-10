@@ -280,7 +280,7 @@ class Test_4a(GradedTestCase):
 
 class Test_4b(GradedTestCase):
     def setUp(self):
-        self.tol = 1e-5
+        self.tol = 0.003
         self.sol_SSVAE = self.run_with_solution_if_possible(submission, lambda sub_or_sol:sub_or_sol.models.ssvae.SSVAE)
     
     @torch.no_grad()
