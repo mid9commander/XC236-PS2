@@ -34,7 +34,7 @@ variables $\bz$ given $\bx$. We then maximize the lower bound to the marginal lo
 the \textbf{evidence lower bound (ELBO)}:
 
 \begin{equation} \label{eq:4}
-    \log p_{\theta}(\bx) \ge \text{ELBO}(\bx; \theta, \phi) = \E_{q_{\phi}(\bz \mid \bx)} [\log p_{\theta}(\bx \mid \bz) - \KL\left(q_{\phi}\left(\bz \mid \bx\right) \mid\mid p\left(\bz\right)\right)]
+    \log p_{\theta}(\bx) \ge \text{ELBO}(\bx; \theta, \phi) = \E_{q_{\phi}(\bz \mid \bx)} [\log p_{\theta}(\bx \mid \bz)] - \KL\left(q_{\phi}\left(\bz \mid \bx\right) \mid\mid p\left(\bz\right)\right)
 \end{equation}
 
 Notice that the negatation of the ELBO decomposes into two terms: (1) \textbf{the reconstruction loss}: $- \E_{q_{\phi}(\bz \mid \bx)}[\log p_{\theta}(\bx \mid \bz)]$, and 

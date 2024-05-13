@@ -4,7 +4,7 @@ So far we have dealt with generative models in the unsupervised setting. We now 
 MNIST dataset, where we have a small number of labeled $\bx_{\ell} = {\{(\bx^{(i)},y^{(i)})\}}_{i=1}^{100}$ pairs in our 
 training data and a large amount of unlabeled data $\bx_{u} = {\{\bx^{(i)}\}}_{i=101}^{60000}$. A label $y^{(i)}$ for an 
 image is simply the number the image $\bx^{(i)}$ represents. We are interested in building a classifier that predicts the 
-label$y$ given the sample $\bx$. One approach is to train a classifier using standard approaches using only the labeled data. 
+label $y$ given the sample $\bx$. One approach is to train a classifier using standard approaches using only the labeled data. 
 However, we would like to leverage the large amount of unlabeled data that we have to improve our classifier’s performance.
 
 We will use a latent variable generative model (a VAE), where the labels $y$ are partially observed, and $\bz$ are always unobserved. 

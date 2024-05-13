@@ -113,6 +113,7 @@ class Test_2a(GradedTestCase):
 
         v_s = submission.utils.log_normal(z, m, v)
 
+        self.assertTrue(not torch.isnan(v_s).any(), "NaN values detected in the log_normal")
         self.assertTrue(not is_different(v_s, ref_log_normal, self.tol), f"Max absolute error {max_error(v_s, ref_log_normal)} > {self.tol}")
     
     @graded()
@@ -125,6 +126,7 @@ class Test_2a(GradedTestCase):
 
         v_s = submission.utils.log_normal_mixture(z, m, v)
 
+        self.assertTrue(not torch.isnan(v_s).any(), "NaN values detected in the log_normal_mixture")
         self.assertTrue(not is_different(v_s, ref_log_normal_mixture, self.tol), f"Max absolute error {max_error(v_s, ref_log_normal_mixture)} > {self.tol}")
 
     ### BEGIN_HIDE ###
