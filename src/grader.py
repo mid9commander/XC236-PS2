@@ -270,7 +270,7 @@ class Test_3d(GradedTestCase):
 class Test_4a(GradedTestCase):
     def setUp(self):
         self.accuracy = 0.735
-        self.accuracy_tol = 2.5
+        self.accuracy_tol = 0.025
     
     @graded()
     def test_0(self):
