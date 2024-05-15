@@ -306,7 +306,7 @@ class Test_4b(GradedTestCase):
 class Test_4c(GradedTestCase):
     def setUp(self):
         self.accuracy = 0.935
-        self.accuracy_tol = 2.5
+        self.accuracy_tol = 0.025
     
     @graded()
     def test_0(self):
