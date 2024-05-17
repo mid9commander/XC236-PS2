@@ -259,6 +259,11 @@ def load_model_by_name(model, global_step, device=None):
 ################################################################################
 
 def write_to_file(metric, kl, rec, run_iwae, iw, gw, model_type):
+        # Ensure each tensor argument is sent to CPU
+        metric = metric.to('cpu') if isinstance(metric, torch.Tensor) else metric
+        kl = kl.to('cpu') if isinstance(kl, torch.Tensor) else kl
+        rec = rec.to('cpu') if isinstance(rec, torch.Tensor) else rec
+
         if run_iwae == True:
             file_path = os.path.join(os.path.dirname(__file__), f'{model_type}_iwae_{iw}.pkl')
             with open(file_path, 'wb') as file:

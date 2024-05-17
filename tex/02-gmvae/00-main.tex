@@ -27,7 +27,7 @@ between a Gaussian distribution $q_{\phi}(\bz \mid \bx)$ and a mixture of Gaussi
 unbiased estimator via Monte Carlo sampling:
 
 \begin{equation} \label{eq:10}
-    \KL(q_{\phi}(\bz \mid \bx) \mid\mid p_{\theta}(\bz)) \approx \log q_{\theta}(\bz^{(1)} \mid \bx) - \log p_{\theta}(\bz^{(1)})
+    \KL(q_{\phi}(\bz \mid \bx) \mid\mid p_{\theta}(\bz)) \approx \log q_{\phi}(\bz^{(1)} \mid \bx) - \log p_{\theta}(\bz^{(1)})
 \end{equation}
 \begin{equation} \label{eq:11}
     = \underbrace{\log \calN(\bz^{(1)} \mid \mu_{\phi}(\bx), \text{diag}(\sigma_{\phi}^2(\bx)))}_\text{\texttt{log\_normal}} - \underbrace{\log\sum\limits_{i=1}^{k} \frac{1}{k}\calN(\bz^{(1)}\mid\mu_i,\text{diag}(\sigma_i^2))}_\text{\texttt{log\_normal\_mixture}}

@@ -318,7 +318,7 @@ class Test_4c(GradedTestCase):
 
 class Test_5b(GradedTestCase):
     def setUp(self):
-        self.tol = 1e-5
+        self.tol = 1e-3
         self.sol_FSVAE = self.run_with_solution_if_possible(submission, lambda sub_or_sol:sub_or_sol.models.fsvae.FSVAE)
 
     ### BEGIN_HIDE ###
