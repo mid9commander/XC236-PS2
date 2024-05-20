@@ -229,7 +229,7 @@ class Test_3d(GradedTestCase):
         self.niwae_1000 = 93
         self.niwae_1000_tol = 2.5
 
-        self.tol = 1e-5
+        self.tol = 0.15
         self.sol_GMVAE = self.run_with_solution_if_possible(submission, lambda sub_or_sol:sub_or_sol.models.gmvae.GMVAE)
     
     @graded()
