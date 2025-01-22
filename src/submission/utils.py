@@ -67,10 +67,10 @@ def log_normal(x, m, v):
     last dim. Basically we're assuming all dims are batch dims except for the
     last dim. 
 
-    NOTE: x in args is a general function that computes the log probability of normal f
-    or a given observation, mean and variance. The fact that the variable is called x is 
-    just of a notation matter as it is a general function that could be used 
-    within other functions that have different objectives.
+    NOTE: The 'x' parameter is a general input representing observations. This function 
+    computes the log probability of a normal distribution for given observations, means, 
+    and variances. The name 'x' is used by convention, but this function can be used in 
+    various contexts where log probabilities of normal distributions are needed.
 
     Args:
         x: tensor: (batch_1, batch_2, ..., batch_k, dim): Observation
