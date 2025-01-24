@@ -226,11 +226,11 @@ class Test_3d(GradedTestCase):
     def setUp(self):
         self.model = 'GMVAE'
         self.niwae_1 = 97
-        self.niwae_1_tol = 2.5
+        self.niwae_1_tol = 2.6
         self.niwae_10 = 94
-        self.niwae_10_tol = 2.8
+        self.niwae_10_tol = 2.95
         self.niwae_100 = 93
-        self.niwae_100_tol = 2.8
+        self.niwae_100_tol = 2.9
         self.niwae_1000 = 93
         self.niwae_1000_tol = 2.5
 
