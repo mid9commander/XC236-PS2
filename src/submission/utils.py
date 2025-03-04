@@ -54,6 +54,11 @@ def sample_gaussian(m, v):
     # consider an alternative using torch.randn_like: https://pytorch.org/docs/stable/generated/torch.randn_like.html
     ################################################################################
     ### START CODE HERE ###
+    epsilon = torch.randn_like(m)
+    std_dev = torch.sqrt(v)
+    z = m + std_dev * epsilon
+    
+    return z
     ### END CODE HERE ###
     ################################################################################
     # End of code modification
@@ -87,6 +92,16 @@ def log_normal(x, m, v):
     # the last dimension
     ################################################################################
     ### START CODE HERE ###
+    log_2pi = torch.log(torch.tensor(2 * torch.pi))
+    log_var = torch.log(v) 
+    inv_var = 1.0/v 
+    try: 
+        log_prob = -0.5 * (log_2pi + log_var + (x - m) ** 2 * inv_var) 
+    except Exception as e:
+        print("blah!")    
+        raise e    
+    return log_prob.sum(dim=-1)
+
     ### END CODE HERE ###
     ################################################################################
     # End of code modification
@@ -112,6 +127,30 @@ def log_normal_mixture(z, m, v):
     # in the batch
     ################################################################################
     ### START CODE HERE ###
+    num_components = m.shape[1]
+    
+    # Compute log probability for each mixture component
+    log_2pi = torch.log(torch.tensor(2 * torch.pi))  # Constant term
+    log_vars = torch.log(v)  # Convert variance to log variance
+    inv_vars = 1.0 / v  # Compute 1/sigma^2
+
+    # Expand z to match the shape of mixture components
+    z_expanded = z.unsqueeze(1)  # (batch_size, 1, latent_dim)
+    
+    # Compute log probability for each component
+    log_probs = -0.5 * (log_2pi + log_vars + (z_expanded - m) ** 2 * inv_vars)  # (batch_size, num_components, latent_dim)
+
+    # Sum over latent dimensions to get per-component log probabilities
+    log_probs = log_probs.sum(dim=-1)  # (batch_size, num_components)
+
+    # Compute log mixture probability using log-sum-exp trick
+    weights = torch.ones(num_components) / num_components  # Uniform weights
+
+    log_weights = torch.log(weights).unsqueeze(0)    
+    log_probs = log_probs + log_weights
+    log_mixture = log_sum_exp(log_probs, dim=1)  # Log-sum-exp over components
+
+    return log_mixture 
     ### END CODE HERE ###
     ################################################################################
     # End of code modification
@@ -217,6 +256,20 @@ def log_mean_exp(x, dim):
     """
     return log_sum_exp(x, dim) - np.log(x.size(dim))
 
+def display_images(x_recon):
+    import matplotlib.pyplot as plt
+
+    # Assume x_recon_best is the reconstructed image from the best z,
+    # and it is of shape (batch_size, data_dim). Let's inspect the first sample.
+    sample_img = x_recon[0].detach().cpu().numpy()  # Convert to numpy array
+
+    # If the image is flattened (e.g., shape (784,)), reshape it to 28x28
+    sample_img = sample_img.reshape(28, 28)
+
+    plt.imshow(sample_img, cmap='gray')
+    plt.title("Reconstructed Image from Best z")
+    plt.axis("off")
+    plt.show()
 
 def log_sum_exp(x, dim=0):
     """

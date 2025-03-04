@@ -48,6 +48,20 @@ class VAE(nn.Module):
         #   nelbo, kl, rec
         ################################################################################
         ### START CODE HERE ###
+        m, logvar = self.enc(x)
+        z = ut.sample_gaussian(m, logvar)
+
+        x_recon_logits = self.dec(z)
+
+        # Then rec is the negative log-likelihood, summed over features (dim=1)
+        rec = -ut.log_bernoulli_with_logits(x, x_recon_logits)
+
+        kl = ut.kl_normal(m, logvar, self.z_prior[0], self.z_prior[1])
+        nelbo = rec + kl
+        nelbo = torch.mean(nelbo)
+        kl = torch.mean(kl)
+        rec = torch.mean(rec)
+        return nelbo, kl, rec
         ### END CODE HERE ###
         ################################################################################
         # End of code modification
@@ -82,12 +96,52 @@ class VAE(nn.Module):
         # splitting the ELBO into the KL and reconstruction terms, but instead consider 
         # calculating log_normal w.r.t prior and q
         ################################################################################
-        ### START CODE HERE ###
-        ### END CODE HERE ###
+        if iw == 10:
+            print("Using 10 importance samples")
+            
+        batch_size = x.shape[0]
+        data_dimension = x.shape[1]
+
+        # Encode x to get latent distribution parameters (mean, log variance)
+        m, logvar = self.enc(x)
+
+        # Sample multiple z's using reparameterization trick
+        samples = []
+        for _ in range(iw):
+            z_single = ut.sample_gaussian(m, logvar)
+            samples.append(z_single)
+        z = torch.stack(samples, dim=1) # batch, iw, dim
+        z_decoded = self.dec(z)
+
+        # Compute log probabilities
+        x_expanded = x.unsqueeze(1).expand(-1, iw, -1)
+
+        # Flatten both for log_bernoulli_with_logits function
+        x_flat = x_expanded.reshape(batch_size * iw, data_dimension)
+        logits_flat = z_decoded.reshape(batch_size * iw, data_dimension)
+        # Compute log p(x|z)
+        log_p_x_given_z_flat = ut.log_bernoulli_with_logits(x_flat, logits_flat)
+        log_px_z = log_p_x_given_z_flat.view(batch_size, iw)  # reshape back to (batch, iw)
+        log_pz = ut.log_normal(z, self.z_prior_m, self.z_prior_v)
+
+        m_expanded = m.unsqueeze(1).expand_as(z)
+        logvar_expanded = logvar.unsqueeze(1).expand_as(z)
+        log_qz_x = ut.log_normal(z, m_expanded, logvar_expanded)
+
+        log_w = log_px_z + log_pz - log_qz_x  # compute importance weights
+
+        iwae_bound = ut.log_mean_exp(log_w, dim=1) 
+
+        # Compute negative IWAE bound (minimization objective)
+        niwae = -torch.mean(iwae_bound)
+        kl = torch.mean(log_qz_x - log_pz) # Compute ELBO decomposition (for iw=1 case)
+        rec = torch.mean(-log_px_z) # Compute ELBO decomposition (for iw=1 case)
+
+        return niwae, kl, rec
         ################################################################################
         # End of code modification
         ################################################################################
-        raise NotImplementedError
+
 
     def loss(self, x):
         nelbo, kl, rec = self.negative_elbo_bound(x)

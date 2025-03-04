@@ -57,9 +57,31 @@ class GMVAE(nn.Module):
         ################################################################################
         # We provide the learnable prior for you. Familiarize yourself with
         # this object by checking its shape.
-        prior = ut.gaussian_parameters(self.z_pre, dim=1)
-        ### START CODE HERE ###
-        ### END CODE HERE ###
+        m_prior, logvar_prior = ut.gaussian_parameters(self.z_pre, dim=1)
+        m, logvar = self.enc(x)
+        z = ut.sample_gaussian(m, logvar)
+
+        x_recon_logits = self.dec(z)
+
+        rec = -ut.log_bernoulli_with_logits(x, x_recon_logits)
+
+        log_normal = ut.log_normal(z, m, logvar)
+
+        batch_size = x.shape[0]
+        mix = m_prior.shape[1]
+
+        m_prior = m_prior.expand(batch_size, mix, -1)
+        logvar_prior = logvar_prior.expand(batch_size, mix, -1)
+
+        log_normal_mixture = ut.log_normal_mixture(z, m_prior, logvar_prior) 
+        #log_normal_mixture = ut.log_normal_mixture(z, m, logvar) # this is wrong
+
+        kl = log_normal - log_normal_mixture
+        nelbo = rec + kl
+        nelbo = torch.mean(nelbo)
+        kl = torch.mean(kl)
+        rec = torch.mean(rec)
+        return nelbo, kl, rec
         ################################################################################
         # End of code modification
         ################################################################################
@@ -91,7 +113,71 @@ class GMVAE(nn.Module):
         ################################################################################
         # We provide the learnable prior for you. Familiarize yourself with
         # this object by checking its shape.
-        prior = ut.gaussian_parameters(self.z_pre, dim=1)
+        m_prior, logvar_prior = ut.gaussian_parameters(self.z_pre, dim=1)
+        batch_size = x.shape[0]
+        data_dimension = x.shape[1]
+
+        m, logvar = self.enc(x)
+
+        samples = []
+        for _ in range(iw):
+            z_single = ut.sample_gaussian(m, logvar)
+            samples.append(z_single)
+        z = torch.stack(samples, dim=1) # batch, iw, dim
+        
+        x_recon_logits = self.dec(z)
+
+        x_expanded = x.unsqueeze(1).expand(batch_size, iw, data_dimension) 
+
+        # Flatten both for log_bernoulli_with_logits function
+        x_flat = x_expanded.reshape(batch_size * iw, data_dimension)
+        logits_flat = x_recon_logits.reshape(batch_size * iw, data_dimension)
+
+        # Compute log p(x|z)        
+        log_p_x_given_z_flat = ut.log_bernoulli_with_logits(x_flat, logits_flat)
+        log_p_x_given_z = log_p_x_given_z_flat.view(batch_size, iw)
+
+        k = m_prior.shape[1]
+        m_prior_exp = m_prior.expand(batch_size, k, -1)            
+        logvar_prior_exp = logvar_prior.expand(batch_size, k, -1)  
+
+
+        log_pz_all = ut.log_normal_mixture(z.unsqueeze(2), m_prior_exp.unsqueeze(1), torch.exp(logvar_prior_exp.unsqueeze(1)))
+        # log_pz = ut.log_normal(z, m_prior_reshape, torch.exp(logvar_prior_reshape))
+        log_pz = ut.log_sum_exp(log_pz_all, dim=-1) - np.log(self.k)
+        del log_pz_all, m_prior_exp, logvar_prior_exp
+
+        m_enc_exp = m.unsqueeze(1).expand(batch_size, iw, -1)       
+        logvar_enc_exp = logvar.unsqueeze(1).expand(batch_size, iw, -1)
+
+        log_q_z_given_x = ut.log_normal_mixture(
+            z, 
+            m_enc_exp, 
+            logvar_enc_exp
+        )        
+        del m_enc_exp, logvar_enc_exp
+
+        # print("log_p_x_given_z mean:", log_p_x_given_z.mean().item())
+        # print("log_pz mean:", log_pz.mean().item())
+        # print("log_q_z_given_x mean:", log_q_z_given_x.mean().item())        
+
+        log_w = log_p_x_given_z + log_pz - log_q_z_given_x
+        del log_p_x_given_z, log_pz, log_q_z_given_x
+
+        iwae_bound = ut.log_mean_exp(log_w, dim=1)  
+       
+
+        niwae = -torch.mean(iwae_bound)
+        del log_w, iwae_bound
+        # rec = -torch.mean(log_p_x_given_z) 
+        # kl  =  torch.mean(log_q_z_given_x - log_pz)
+
+        rec = -torch.mean(x_recon_logits)  # Alternatively, use -mean(log_p_x_given_z) if computed per sample.
+        kl = torch.tensor(0.0, device=x.device)  # If not
+
+        print("niwae", niwae, "kl", kl, "rec", rec)
+        return niwae, kl, rec
+
         ### START CODE HERE ###
         ### END CODE HERE ###
         ################################################################################
