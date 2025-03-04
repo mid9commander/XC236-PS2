@@ -119,11 +119,15 @@ class GMVAE(nn.Module):
 
         m, logvar = self.enc(x)
 
-        samples = []
-        for _ in range(iw):
-            z_single = ut.sample_gaussian(m, logvar)
-            samples.append(z_single)
-        z = torch.stack(samples, dim=1) # batch, iw, dim
+        # samples = []
+        # for _ in range(iw):
+        #     z_single = ut.sample_gaussian(m, logvar)
+        #     samples.append(z_single)
+        # z = torch.stack(samples, dim=1) # batch, iw, dim
+
+        z_list = [ut.sample_gaussian(m, logvar) for _ in range(iw)]
+        z = torch.stack(z_list, dim=1)        
+        del z_list
         
         x_recon_logits = self.dec(z)
 
